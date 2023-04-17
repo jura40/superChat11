@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>Public Chat</title>
+</head>
+
+<body>
+  <h1>Public Chat</h1>
+
+  <div id="messages-container">
+    <ul id="messages-list"></ul>
+  </div>
+
+  <form id="message-form">
+    <div>
+      <label for="message-input">Message:</label>
+      <input type="text" id="message-input" name="message" required>
+    </div>
+    <button type="submit">Send</button>
+  </form>
+  <form id="login-form" action="/login" method="post">
+    <div>
+      <label for="username">Username:</label>
+      <input type="text" id="username" name="username" required>
+    </div>
+    <div>
+      <label for="password">Password:</label>
+      <input type="password" id="password" name="password" required>
+    </div>
+    <button type="submit">Login</button>
+
+    <a href="/get-register"> Har du inte ett konto?</a>
+  </form>
+  </br>
+  <button>Logga in för att se privat grupp.</button>
+  <div id="login-message"></div>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <script>
+    const form = document.getElementById('login-form');
+    const message = document.getElementById('login-message');
+
+    form.addEventListener('submit', async event => {
+      event.preventDefault();
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+
+      try {
+        const response = await axios.post('/login', { username, password });
+        const { token } = response.data;
+        localStorage.setItem('token', token);
+        message.textContent = 'Login successful';
+        window.location.replace("/home");
+
+      } catch (error) {
+        console.error(error);
+        message.textContent = 'Login failed';
+      }
+    });
+  </script>
+
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <script>
+
+    const messagesList = document.getElementById('messages-list');
+    const messageForm = document.getElementById('message-form');
+    const messageInput = document.getElementById('message-input');
+    const loginMessage = document.getElementById('login-message');
+
+    // Fetch public messages
+    async function fetchPublicMessages() {
+      try {
+        const response = await axios.get('/public');
+        const messages = response.data;
+
+        messagesList.innerHTML = '';
+
+        for (const message of messages) {
+          const li = document.createElement('li');
+          li.textContent = `${message.username}: ${message.text}: ${message.date}`;
+          messagesList.appendChild(li);
+        }
+      } catch (error) {
+        console.error(error);
+        loginMessage.textContent = 'Failed to fetch messages';
+      }
+    }
+
+    // Send message
+    async function sendMessage(event) {
+      event.preventDefault();
+
+      const username = 'guest'; // hardcoded username value for demo purposes
+      const text = messageInput.value;
+
+      try {
+        await axios.post('/public', { username, text });
+
+        messageInput.value = '';
+        loginMessage.textContent = '';
+        await fetchPublicMessages();
+      } catch (error) {
+        console.error(error);
+        loginMessage.textContent = 'Failed to send message';
+      }
+    }
+
+
+    // Fetch messages when page loads
+    fetchPublicMessages();
+
+    // Add event listener for message form submit
+    messageForm.addEventListener('submit', sendMessage);
+  </script>
+</body>
+
+</html>

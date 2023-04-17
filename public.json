@@ -1,0 +1,24 @@
+{
+  "channels": [
+    {
+      "name": "public",
+      "messages": [
+        {
+          "username": "guest",
+          "text": "Hej, hur är läget? Någon som vill diskutera politik",
+          "date": "2023-03-09 10:39:48"
+        },
+        {
+          "username": "guest",
+          "text": "Ja visst, men kan vi inte byta till privata kanalen istället?",
+          "date": "2023-03-09 10:40:34"
+        },
+        {
+          "username": "guest",
+          "text": "sxas",
+          "date": "2023-04-17 10:49:04"
+        }
+      ]
+    }
+  ]
+}

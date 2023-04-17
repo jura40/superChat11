@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Public Chat</title>
+</head>
+
+<body>
+    <h1>Public Chat</h1>
+    <a href="/logout-now"> Logga ut</a>
+    <div id="messages-container">
+        <ul id="messages-list"></ul>
+    </div>
+
+    <form id="message-form">
+        <div>
+            <label for="message-input">Message:</label>
+            <input type="text" id="message-input" name="message" required>
+        </div>
+        <button type="submit">Send</button>
+    </form>
+
+    <div id="login-message"></div>
+    </br>
+    <button onclick="location.href = './private-chatt';">Private</button>
+
+
+
+
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+
+    <!-- PUBLIC -->
+    <script>
+
+        const messagesList = document.getElementById('messages-list');
+        const messageForm = document.getElementById('message-form');
+        const messageInput = document.getElementById('message-input');
+        const loginMessage = document.getElementById('login-message');
+
+        // Fetch public messages
+        async function fetchPublicMessages() {
+
+            try {
+                const response = await axios.get('/public');
+                const messages = response.data;
+
+                messagesList.innerHTML = '';
+
+                for (const message of messages) {
+                    const li = document.createElement('li');
+                    li.textContent = `${message.username}: ${message.text}: ${message.date}`;
+                    messagesList.appendChild(li);
+                }
+            } catch (error) {
+                console.error(error);
+                loginMessage.textContent = 'Failed to fetch messages';
+            }
+        }
+
+        // Send message
+        async function sendMessage(event) {
+            event.preventDefault();
+            const token = localStorage.getItem('token');
+
+            // Decode token to get username
+            const tokenPayload = token.split('.')[1];
+            const decodedTokenPayload = JSON.parse(atob(tokenPayload));
+            const username = decodedTokenPayload.username;
+
+            const text = messageInput.value;
+
+            try {
+                await axios.post('/public', { username, text });
+
+                messageInput.value = '';
+                loginMessage.textContent = '';
+                await fetchPublicMessages();
+            } catch (error) {
+                console.error(error);
+                loginMessage.textContent = 'Failed to send message';
+            }
+        }
+
+
+        // Fetch messages when page loads
+        fetchPublicMessages();
+
+        // Add event listener for message form submit
+        messageForm.addEventListener('submit', sendMessage);
+    </script>
+</body>
+
+</html>

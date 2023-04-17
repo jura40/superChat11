@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Registration</title>
+</head>
+
+<body>
+    <h1>Registration</h1>
+    <form id="registration-form">
+        <div>
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" required>
+        </div>
+        <div>
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required>
+        </div>
+        <button type="submit">Register</button>
+    </form>
+    <div id="registration-message"></div>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script>
+        const form = document.getElementById('registration-form');
+        const message = document.getElementById('registration-message');
+
+        form.addEventListener('submit', async event => {
+            event.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            try {
+                const response = await axios.post('/register', { username, password });
+                message.textContent = 'Registration successful';
+            } catch (error) {
+                console.error(error);
+                message.textContent = 'Registration failed';
+            }
+        });
+    </script>
+</body>
+
+</html>

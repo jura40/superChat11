@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Private Chat</title>
+
+</head>
+
+<body>
+    <h1>Private Chat</h1>
+    <a href="/logout-now"> Logga ut</a>
+
+    <div id="private-messages-container">
+        <ul id="private-messages-list"></ul>
+    </div>
+
+    <form id="private-message-form">
+        <div>
+            <label for="private-message-input">Message:</label>
+            <input type="text" id="private-message-input" name="message" required>
+        </div>
+        <button type="submit">Send</button>
+    </form>
+
+    <div id="private-login-message"></div>
+
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+
+    <!-- PRIVAT -->
+    <script>
+
+        const PrivateMessagesList = document.getElementById('private-messages-list');
+        const PrivateMessageForm = document.getElementById('private-message-form');
+        const PrivateMessageInput = document.getElementById('private-message-input');
+        const PrivateLoginMessage = document.getElementById('private-login-message');
+
+        // Fetch public messages
+        async function fetchPrivateMessages() {
+            try {
+                const response = await axios.get('/private');
+                const messages = response.data;
+
+                PrivateMessagesList.innerHTML = '';
+
+                for (const message of messages) {
+                    const li = document.createElement('li');
+                    li.textContent = `${message.username}: ${message.text}: ${message.date}`;
+                    PrivateMessagesList.appendChild(li);
+                }
+            } catch (error) {
+                console.error(error);
+                PrivateLoginMessage.textContent = 'Failed to fetch messages';
+            }
+        }
+
+        async function sendMessage(event) {
+            event.preventDefault();
+
+            const token = localStorage.getItem('token');
+
+            // Decode token to get username
+            const tokenPayload = token.split('.')[1];
+            const decodedTokenPayload = JSON.parse(atob(tokenPayload));
+            const username = decodedTokenPayload.username;
+
+            const text = PrivateMessageInput.value;
+
+            try {
+                await axios.post('/private', { username, text });
+
+                PrivateMessageInput.value = '';
+                PrivateLoginMessage.textContent = '';
+                await fetchPrivateMessages();
+            } catch (error) {
+                console.error(error);
+                PrivateLoginMessage.textContent = 'Failed to send message';
+            }
+        }
+
+
+
+        // Fetch messages when page loads
+        fetchPrivateMessages();
+
+        // Add event listener for message form submit
+        PrivateMessageForm.addEventListener('submit', sendMessage);
+    </script>
+
+
+</body>
+
+</html>

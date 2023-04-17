@@ -1,0 +1,14 @@
+{
+  "channels": [
+    {
+      "name": "private",
+      "messages": [
+        {
+          "username": "Arne",
+          "text": "Hur ser det politiska läget ut just nu i Sverige?",
+          "date": "2023-03-09 11:35:10"
+        }
+      ]
+    }
+  ]
+}
